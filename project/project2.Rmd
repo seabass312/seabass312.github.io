@@ -1,0 +1,329 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "SDS348"
+date: ''
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+library(tidyverse)
+```
+
+
+```{r global_options, include=FALSE}
+#LEAVE THIS CHUNK ALONE!
+library(knitr)
+opts_chunk$set(fig.align="center", fig.height=5, message=FALSE, warning=FALSE, fig.width=8, tidy.opts=list(width.cutoff=60),tidy=TRUE)
+
+class_diag<-function(probs,truth){
+  
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+
+```
+#0. 
+
+*This project was a very interesting one and as such I thought loud and hard about what data I was going to use for it! I am quite passionate about health and fitness. The variables that  I collected using MyFitnessPal are Calories, which is the number that I consumed each day and EnoughFiber which is whether or not I got the recommended amount of fiber for the day. The variables that I got from my workout tracker are MaxHR, which is my maximum heart rate, AvgHR, which is my average heart rate, and WoDuration which is the duration of my workout. I expect that there will be a positive correlation between AvgHR and MaxHR.*
+
+#1.
+
+```{R}
+
+
+
+
+
+library(tidyverse)
+HeartRateStats<-read_csv("HeartRateStatsss.csv")
+HR<-HeartRateStats
+HR
+MyFitnessPalStatsProject <-read_csv("MyFitnessPalStatsProject.csv")
+ 
+bigboi <-full_join(HR, MyFitnessPalStatsProject, by=c("Day"))
+
+bigboi
+
+
+
+
+man112<-manova(cbind(MaxHR,AvgHR,WoDuration,Calories)~EnoughFiber, data=bigboi)
+summary(man112)
+
+summary.aov(man112)
+
+pairwise.t.test(bigboi$Calories,bigboi$EnoughFiber, p.adj="none")
+
+```
+*There were six total tests done which gives us a new p-value of 0.008. The chance of a Type 1 Error is 26.49%. As for the manova assumptions, it is likley that the linear relationships among DVs, and the no extreme univariate or multivariate outliers was met. The other ones were probably not honestly.*
+
+#2.
+```{R}
+summary(aov(Calories~EnoughFiber,data=bigboi))
+
+obs_F <- 45.37
+
+
+Fs <- replicate(5000,{ 
+  new <- bigboi%>%mutate(Cals=sample(Calories))
+  
+  SSW <- new %>% group_by(EnoughFiber) %>% summarize(SSW=sum((Cals-mean(Cals))^2),.groups = 'keep') %>%        summarize(sum(SSW),.groups = 'keep') %>% pull
+  SSB <- new %>% mutate(mean=mean(Cals)) %>% group_by(EnoughFiber) %>%mutate(groupmean=mean(Calories)) %>% summarize(SSB=sum((mean-groupmean)^2),.groups = 'keep') %>%  summarize(sum(SSB),.groups = 'keep')%>%pull
+ (SSB/1)/(SSW/48)
+})
+  
+
+hist(Fs, prob=T); abline(v = obs_F, col="red",add=T)
+
+mean(Fs>obs_F)
+
+```
+*The null is that there is no significant difference between the EnoughFiber groups when it comes to Calories. The alternative hypothesis is that there is a significant difference between the EnoughFiber groups when it comes to calories. The results of the test indicates that we should reject our null and conclude that there is a significant difference between EnoughFiber groups when it comes to calories!*
+
+
+#3
+
+```{R}
+#install.packages("lmtest")
+library(lmtest)
+library(sandwich)
+library(tidyverse)
+bigboi
+
+bigboi%>%ggplot(aes(WoDuration,Calories,color=AvgHR))+geom_point()+geom_smooth(method = 'lm',se=F)
+
+bigboi<-bigboi %>% mutate("Woduration_C"=WoDuration-mean(WoDuration), "Calaories_c"=Calories-mean(Calories), "AvgHR_c"=AvgHR-mean(AvgHR))
+
+fight<-lm(Calaories_c~Woduration_C*AvgHR_c, data= bigboi)
+summary(fight)
+
+summary(fight)$r.sq
+
+
+rety<-bptest(fight)
+rety
+
+summary(fight)$coef[,1:2]
+
+coeftest(fight,vcov=vcovHC(fight))[,1:2]
+
+residss<-fight$residuals
+
+fitvalss<-fight$fitted.values
+
+ggplot()+geom_point(aes(fitvalss,residss))+geom_hline(yintercept=0, color='red')
+
+shapiro.test(residss)
+
+```
+*Given the result of the Shapiro-Wilk test, we can see that the data meets the normality assumption and a bptest shows that the data is indeed linear.The model explains 0.16 proportion of the variation of the dependent variable. The robust std errors are much greater overall! This means that our p-value will usually be greater and our power is increased! Looking at the coefficients one by one we see for every increase in minute of daily workouts for average days, calorie consumption increase by 3.3689 when holding average heartrate constant. Next when we look at AvgHR, we see that for average days with each increase of heartrate we see that calories decrease by 2.27. Those with average WoDuration and Averag AvgHR have 0.386 less calories than the average calorie amount per day.*
+
+#4
+
+```{R}
+
+
+bigboi
+fight<-lm(Calaories_c~Woduration_C*AvgHR_c, data=bigboi)
+ residsas<-fight$residuals   
+fitteded<-fight$fitted.values
+
+resid_resamp<-replicate(5000,{
+  new_resids<-sample(residsas,replace=TRUE)  
+  bigboi$new_y<-fitteded+new_resids  
+  fight<-lm(new_y~WoDuration+AvgHR,data=bigboi) 
+coef(fight) 
+
+})
+coef(fight)
+resid_resamp%>%t%>%as.data.frame%>%summarize_all(sd)
+
+```
+*The standard errors are even higher which gives us an even higher power and which means our p-value is even higher!*
+
+
+
+#5
+
+```{R}
+library(tidyverse)
+library(lmtest)
+library(plotROC)
+data<-bigboi%>%mutate(y=ifelse(EnoughFiber=="Yes",1,0)) 
+
+head(data)
+bigboi
+
+fiast<-glm(y~Calaories_c+AvgHR_c,data=data,family=binomial(link="logit"))
+
+coeftest(fiast)
+exp(coef(fiast))
+
+
+
+
+probssss<-predict(fiast,type="response")
+
+
+
+table(predict=as.numeric(probssss>.5),truth=data$y)%>%addmargins
+
+ROCplota<-ggplot(data)+geom_roc(aes(d=y,m=probssss), n.cuts=0) 
+
+ROCplota
+calc_auc(ROCplota)
+
+
+
+#Accuracy
+(45+4)/50
+
+#Sensitivity
+4/5
+
+#Specificity
+45/45
+
+
+#Precision
+4/5
+
+
+data$logit<-predict(fiast,type="link") #get log-odds for everyone
+
+table(predict=as.numeric(probssss>.5),truth=data$y)%>%addmargins
+
+## Density plot of log-odds for each outcome:
+
+data%>%ggplot()+geom_density(aes(logit,color=EnoughFiber,fill=EnoughFiber), alpha=.4)+
+  theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab("logit (log-odds)")+
+  geom_rug(aes(logit,color=EnoughFiber))+
+  geom_text(x=-5,y=.07,label="TN = 45")+
+  geom_text(x=-1.75,y=.008,label="FN = 1")+
+  geom_text(x=1,y=.006,label="FP = 0")+
+  geom_text(x=5,y=.04,label="TP = 4")
+
+
+
+
+```
+*The AUC is 0.98 which is great and the accuracy, sensitivity, specificity and precision are all pretty high!  Going up 1 calorie increase the odds of the day containing enough fiber by 1.03 while going up 1 heart rate unit increases the same odd by 0.980.*
+
+#6
+
+
+```{R}
+bigboi
+fiastsda<-glm(y~Calories+MaxHR+AvgHR+WoDuration,data=data,family=binomial(link="logit"))
+
+probssssas<-predict(fiastsda,type="response")
+
+
+ROCplotass<-ggplot(data)+geom_roc(aes(d=y,m=probssssas), n.cuts=0) 
+
+ROCplotass
+calc_auc(ROCplotass)
+
+
+
+table(predict=as.numeric(probssssas>.5),truth=data$y)%>%addmargins
+
+#Accuracy
+(45+4)/50
+
+#Sensitivity
+4/5
+
+#Specificity
+45/45
+
+#Precision
+4/5
+
+
+class_diag(predict(fiastsda,type="response"),data$y)
+
+
+
+library(glmnet) #install.packages("glmnet") if you need to
+set.seed(1234)
+y<-as.matrix(data$y) #grab response
+x<-model.matrix(y~(.),data=data)[,-1] #grab predictors
+head(x)
+
+
+
+
+
+
+data
+cv<-cv.glmnet(x,y,family="binomial")
+{plot(cv$glmnet.fit, "lambda", label=TRUE); abline(v = log(cv$lambda.1se)); abline(v = log(cv$lambda.min),lty=2)}
+
+
+lasso<-glmnet(x,y,family="binomial",lambda=cv$lambda.1se)
+coef(lasso)
+
+library(tidyverse)
+
+lassofit<-glm(y~EnoughFiber,data=data,family="binomial")
+
+
+lassodata<-data %>% mutate(EnoughFiber=ifelse(EnoughFiber=="Yes",1,0)) 
+
+lassodata
+
+
+
+
+class_diag(predict(lassofit,type="response"),lassodata$y)
+
+
+```
+*The auc for the initial model before lasso with all the variables is 0.56444 and the sensitivity is awful while the accuracy and specificity are high! When I ran the lasso, only the EnoughFiber variable remained! The new auc ended up being 1! This is higher than the previous AUCs calculated!*
+...
+
+
+
+
+

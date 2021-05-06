@@ -1,0 +1,53 @@
+---
+title: "Resume"
+output: html_document
+hidedate: true
+hiderelated: true
+hidediscus: true
+---
+
+
+
+Hugo Certuche
+
+
+
+*Education*
+
+Carnegie Vanguard High School 2013-2017
+
+University of Texas at Austin 2017-2021
+
+
+*Work Experience*
+
+Customer Service at Dental Office 2015-2020
+
+Health Coach 2021-Present
+
+
+*Skills*
+
+Long term experience with building computers and with electronics
+
+Motivational Interviewing
+
+Accomplishments
+Honor Roll UT Austin Fall 2020
+
+
+*Interests*
+
+Singing
+
+Building Legos
+
+Reading about the universe
+
+Stephen Hawking
+
+
+*Contact Info:*
+sebastian.certuche@utexas.edu
+
+

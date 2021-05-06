@@ -1,0 +1,47 @@
+---
+title: Coding
+author: ''
+date: '2021-05-05'
+slug: new
+categories: []
+tags: []
+description: ''
+---
+
+This blog gives an example of coding in python and r and how they can be combined. The last part is useful because it shows that these languages are not fully separate but are interrelated in a way and can be used together.
+
+```{R}
+
+
+yeet<-c(1,3,2)
+
+yeet
+
+
+
+
+```
+```{python}
+hw = "hello world"
+hw[0:11]
+```
+```{R}
+#R code chunk
+library(reticulate)
+
+hi<-"Walken here!"
+```
+
+```{python}
+#Python code chunk
+hi="Hey I'm"
+print(hi,r.hi) #access R-defined objects with r.
+```
+![](/img/walkeeen.png)
+
+[Link to project 1](/project/project1/)
+
+[Link to project 2](/project/project2/)
+
+
+[Favorite memes](https://rr.noordstar.me/dbf253f9)

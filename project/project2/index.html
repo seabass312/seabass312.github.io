@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Hugo Certuche" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 2: Modeling, Testing, and Predicting</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project2/">Project 2: Modeling, Testing, and Predicting</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<p>#0.</p>
+<p><em>This project was a very interesting one and as such I thought loud and hard about what data I was going to use for it! I am quite passionate about health and fitness. The variables that I collected using MyFitnessPal are Calories, which is the number that I consumed each day and EnoughFiber which is whether or not I got the recommended amount of fiber for the day. The variables that I got from my workout tracker are MaxHR, which is my maximum heart rate, AvgHR, which is my average heart rate, and WoDuration which is the duration of my workout. I expect that there will be a positive correlation between AvgHR and MaxHR.</em></p>
+<p>#1.</p>
+<pre class="r"><code>library(tidyverse)
+HeartRateStats &lt;- read_csv(&quot;HeartRateStatsss.csv&quot;)
+HR &lt;- HeartRateStats
+HR</code></pre>
+<pre><code>## # A tibble: 50 x 4
+##      Day MaxHR AvgHR WoDuration
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;
+##  1     1   184   149         65
+##  2     2   175   109         64
+##  3     3   184   116         80
+##  4     4   160   100         59
+##  5     5   180   142         68
+##  6     6   170   124         70
+##  7     7   180   142         85
+##  8     8   160   100         86
+##  9     9   169   116         89
+## 10    10   165   108         68
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>MyFitnessPalStatsProject &lt;- read_csv(&quot;MyFitnessPalStatsProject.csv&quot;)
+
+bigboi &lt;- full_join(HR, MyFitnessPalStatsProject, by = c(&quot;Day&quot;))
+
+bigboi</code></pre>
+<pre><code>## # A tibble: 50 x 6
+##      Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
+##  1     1   184   149         65     1677 No         
+##  2     2   175   109         64     1683 No         
+##  3     3   184   116         80     1686 No         
+##  4     4   160   100         59     1684 No         
+##  5     5   180   142         68     1682 No         
+##  6     6   170   124         70     1068 No         
+##  7     7   180   142         85     1680 No         
+##  8     8   160   100         86     2250 Yes        
+##  9     9   169   116         89     1686 No         
+## 10    10   165   108         68     1689 No         
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>man112 &lt;- manova(cbind(MaxHR, AvgHR, WoDuration, Calories) ~ 
+    EnoughFiber, data = bigboi)
+summary(man112)</code></pre>
+<pre><code>## Df Pillai approx F num Df den Df Pr(&gt;F)
+## EnoughFiber 1 0.51401 11.899 4 45 1.118e-06 ***
+## Residuals 48
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>summary.aov(man112)</code></pre>
+<pre><code>## Response MaxHR :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## EnoughFiber 1 97.07 97.069 1.6885 0.2
+## Residuals 48 2759.51 57.490
+##
+## Response AvgHR :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## EnoughFiber 1 1286.9 1286.94 3.8659 0.05507 .
+## Residuals 48 15978.8 332.89
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response WoDuration :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## EnoughFiber 1 141.1 141.120 1.9691 0.167
+## Residuals 48 3440.0 71.667
+##
+## Response Calories :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## EnoughFiber 1 728585 728585 45.37 1.87e-08 ***
+## Residuals 48 770813 16059
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>pairwise.t.test(bigboi$Calories, bigboi$EnoughFiber, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  bigboi$Calories and bigboi$EnoughFiber 
+## 
+##     No     
+## Yes 1.9e-08
+## 
+## P value adjustment method: none</code></pre>
+<p><em>There were six total tests done which gives us a new p-value of 0.008. The chance of a Type 1 Error is 26.49%. As for the manova assumptions, it is likley that the linear relationships among DVs, and the no extreme univariate or multivariate outliers was met. The other ones were probably not honestly.</em></p>
+<p>#2.</p>
+<pre class="r"><code>summary(aov(Calories ~ EnoughFiber, data = bigboi))</code></pre>
+<pre><code>## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## EnoughFiber 1 728585 728585 45.37 1.87e-08 ***
+## Residuals 48 770813 16059
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>obs_F &lt;- 45.37
+
+
+Fs &lt;- replicate(5000, {
+    new &lt;- bigboi %&gt;% mutate(Cals = sample(Calories))
+    
+    SSW &lt;- new %&gt;% group_by(EnoughFiber) %&gt;% summarize(SSW = sum((Cals - 
+        mean(Cals))^2), .groups = &quot;keep&quot;) %&gt;% summarize(sum(SSW), 
+        .groups = &quot;keep&quot;) %&gt;% pull
+    SSB &lt;- new %&gt;% mutate(mean = mean(Cals)) %&gt;% group_by(EnoughFiber) %&gt;% 
+        mutate(groupmean = mean(Calories)) %&gt;% summarize(SSB = sum((mean - 
+        groupmean)^2), .groups = &quot;keep&quot;) %&gt;% summarize(sum(SSB), 
+        .groups = &quot;keep&quot;) %&gt;% pull
+    (SSB/1)/(SSW/48)
+})
+
+
+hist(Fs, prob = T)
+abline(v = obs_F, col = &quot;red&quot;, add = T)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>mean(Fs &gt; obs_F)</code></pre>
+<pre><code>## [1] 0.4941</code></pre>
+<p><em>The null is that there is no significant difference between the EnoughFiber groups when it comes to Calories. The alternative hypothesis is that there is a significant difference between the EnoughFiber groups when it comes to calories. The results of the test indicates that we should reject our null and conclude that there is a significant difference between EnoughFiber groups when it comes to calories!</em></p>
+<p>#3</p>
+<pre class="r"><code># install.packages(&#39;lmtest&#39;)
+library(lmtest)
+library(sandwich)
+library(tidyverse)
+bigboi</code></pre>
+<pre><code>## # A tibble: 50 x 6
+##      Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
+##  1     1   184   149         65     1677 No         
+##  2     2   175   109         64     1683 No         
+##  3     3   184   116         80     1686 No         
+##  4     4   160   100         59     1684 No         
+##  5     5   180   142         68     1682 No         
+##  6     6   170   124         70     1068 No         
+##  7     7   180   142         85     1680 No         
+##  8     8   160   100         86     2250 Yes        
+##  9     9   169   116         89     1686 No         
+## 10    10   165   108         68     1689 No         
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>bigboi %&gt;% ggplot(aes(WoDuration, Calories, color = AvgHR)) + 
+    geom_point() + geom_smooth(method = &quot;lm&quot;, se = F)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>bigboi &lt;- bigboi %&gt;% mutate(Woduration_C = WoDuration - mean(WoDuration), 
+    Calaories_c = Calories - mean(Calories), AvgHR_c = AvgHR - 
+        mean(AvgHR))
+
+fight &lt;- lm(Calaories_c ~ Woduration_C * AvgHR_c, data = bigboi)
+summary(fight)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = Calaories_c ~ Woduration_C * AvgHR_c, data
+= bigboi)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -595.63 -63.72 8.52 69.63 453.98
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) -16.9261 24.2846 -0.697 0.4893
+## Woduration_C 3.3689 2.9179 1.155 0.2542
+## AvgHR_c -2.2708 1.3513 -1.681 0.0996 .
+## Woduration_C:AvgHR_c -0.3862 0.1505 -2.565 0.0136 *
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Residual standard error: 165.3 on 46 degrees of freedom
+## Multiple R-squared: 0.1621, Adjusted R-squared: 0.1075
+## F-statistic: 2.967 on 3 and 46 DF, p-value: 0.0416</code></pre>
+<pre class="r"><code>summary(fight)$r.sq</code></pre>
+<pre><code>## [1] 0.1621472</code></pre>
+<pre class="r"><code>rety &lt;- bptest(fight)
+rety</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fight
+## BP = 3.9574, df = 3, p-value = 0.2661</code></pre>
+<pre class="r"><code>summary(fight)$coef[, 1:2]</code></pre>
+<pre><code>##                         Estimate Std. Error
+## (Intercept)          -16.9260608 24.2845615
+## Woduration_C           3.3688681  2.9179456
+## AvgHR_c               -2.2708351  1.3512691
+## Woduration_C:AvgHR_c  -0.3861647  0.1505316</code></pre>
+<pre class="r"><code>coeftest(fight, vcov = vcovHC(fight))[, 1:2]</code></pre>
+<pre><code>##                         Estimate Std. Error
+## (Intercept)          -16.9260608 24.4364098
+## Woduration_C           3.3688681  4.0842749
+## AvgHR_c               -2.2708351  1.6457435
+## Woduration_C:AvgHR_c  -0.3861647  0.2522609</code></pre>
+<pre class="r"><code>residss &lt;- fight$residuals
+
+fitvalss &lt;- fight$fitted.values
+
+ggplot() + geom_point(aes(fitvalss, residss)) + geom_hline(yintercept = 0, 
+    color = &quot;red&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-3-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>shapiro.test(residss)</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  residss
+## W = 0.89629, p-value = 0.0003631</code></pre>
+<p><em>Given the result of the Shapiro-Wilk test, we can see that the data meets the normality assumption and a bptest shows that the data is indeed linear.The model explains 0.16 proportion of the variation of the dependent variable. The robust std errors are much greater overall! This means that our p-value will usually be greater and our power is increased! Looking at the coefficients one by one we see for every increase in minute of daily workouts for average days, calorie consumption increase by 3.3689 when holding average heartrate constant. Next when we look at AvgHR, we see that for average days with each increase of heartrate we see that calories decrease by 2.27. Those with average WoDuration and Averag AvgHR have 0.386 less calories than the average calorie amount per day.</em></p>
+<p>#4</p>
+<pre class="r"><code>bigboi</code></pre>
+<pre><code>## # A tibble: 50 x 9
+## Day MaxHR AvgHR WoDuration Calories EnoughFiber
+Woduration_C Calaories_c AvgHR_c
+## &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 1 184 149 65 1677 No -1.76 9.54 24.4
+## 2 2 175 109 64 1683 No -2.76 15.5 -15.6
+## 3 3 184 116 80 1686 No 13.2 18.5 -8.62
+## 4 4 160 100 59 1684 No -7.76 16.5 -24.6
+## 5 5 180 142 68 1682 No 1.24 14.5 17.4
+## 6 6 170 124 70 1068 No 3.24 -599.  -0.62
+## 7 7 180 142 85 1680 No 18.2 12.5 17.4
+## 8 8 160 100 86 2250 Yes 19.2 583.  -24.6
+## 9 9 169 116 89 1686 No 22.2 18.5 -8.62
+## 10 10 165 108 68 1689 No 1.24 21.5 -16.6
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>fight &lt;- lm(Calaories_c ~ Woduration_C * AvgHR_c, data = bigboi)
+residsas &lt;- fight$residuals
+fitteded &lt;- fight$fitted.values
+
+resid_resamp &lt;- replicate(5000, {
+    new_resids &lt;- sample(residsas, replace = TRUE)
+    bigboi$new_y &lt;- fitteded + new_resids
+    fight &lt;- lm(new_y ~ WoDuration + AvgHR, data = bigboi)
+    coef(fight)
+    
+})
+coef(fight)</code></pre>
+<pre><code>## (Intercept) Woduration_C AvgHR_c Woduration_C:AvgHR_c
+## -16.9260608 3.3688681 -2.2708351 -0.3861647</code></pre>
+<pre class="r"><code>resid_resamp %&gt;% t %&gt;% as.data.frame %&gt;% summarize_all(sd)</code></pre>
+<pre><code>##   (Intercept) WoDuration    AvgHR
+## 1    273.4166   2.701208 1.270371</code></pre>
+<p><em>The standard errors are even higher which gives us an even higher power and which means our p-value is even higher!</em></p>
+<p>#5</p>
+<pre class="r"><code>library(tidyverse)
+library(lmtest)
+library(plotROC)
+data &lt;- bigboi %&gt;% mutate(y = ifelse(EnoughFiber == &quot;Yes&quot;, 1, 
+    0))
+
+head(data)</code></pre>
+<pre><code>## # A tibble: 6 x 10
+## Day MaxHR AvgHR WoDuration Calories EnoughFiber
+Woduration_C Calaories_c AvgHR_c y
+## &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+&lt;dbl&gt;
+## 1 1 184 149 65 1677 No -1.76 9.54 24.4 0
+## 2 2 175 109 64 1683 No -2.76 15.5 -15.6 0
+## 3 3 184 116 80 1686 No 13.2 18.5 -8.62 0
+## 4 4 160 100 59 1684 No -7.76 16.5 -24.6 0
+## 5 5 180 142 68 1682 No 1.24 14.5 17.4 0
+## 6 6 170 124 70 1068 No 3.24 -599.  -0.62 0</code></pre>
+<pre class="r"><code>bigboi</code></pre>
+<pre><code>## # A tibble: 50 x 9
+## Day MaxHR AvgHR WoDuration Calories EnoughFiber
+Woduration_C Calaories_c AvgHR_c
+## &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 1 184 149 65 1677 No -1.76 9.54 24.4
+## 2 2 175 109 64 1683 No -2.76 15.5 -15.6
+## 3 3 184 116 80 1686 No 13.2 18.5 -8.62
+## 4 4 160 100 59 1684 No -7.76 16.5 -24.6
+## 5 5 180 142 68 1682 No 1.24 14.5 17.4
+## 6 6 170 124 70 1068 No 3.24 -599.  -0.62
+## 7 7 180 142 85 1680 No 18.2 12.5 17.4
+## 8 8 160 100 86 2250 Yes 19.2 583.  -24.6
+## 9 9 169 116 89 1686 No 22.2 18.5 -8.62
+## 10 10 165 108 68 1689 No 1.24 21.5 -16.6
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>fiast &lt;- glm(y ~ Calaories_c + AvgHR_c, data = data, family = binomial(link = &quot;logit&quot;))
+
+coeftest(fiast)</code></pre>
+<pre><code>##
+## z test of coefficients:
+##
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) -4.281017 1.397183 -3.0640 0.002184 **
+## Calaories_c 0.033751 0.022611 1.4927 0.135528
+## AvgHR_c -0.020077 0.057266 -0.3506 0.725899
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>exp(coef(fiast))</code></pre>
+<pre><code>## (Intercept) Calaories_c     AvgHR_c 
+##   0.0138286   1.0343268   0.9801234</code></pre>
+<pre class="r"><code>probssss &lt;- predict(fiast, type = &quot;response&quot;)
+
+
+
+table(predict = as.numeric(probssss &gt; 0.5), truth = data$y) %&gt;% 
+    addmargins</code></pre>
+<pre><code>##        truth
+## predict  0  1 Sum
+##     0   45  1  46
+##     1    0  4   4
+##     Sum 45  5  50</code></pre>
+<pre class="r"><code>ROCplota &lt;- ggplot(data) + geom_roc(aes(d = y, m = probssss), 
+    n.cuts = 0)
+
+ROCplota</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(ROCplota)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.9866667</code></pre>
+<pre class="r"><code># Accuracy
+(45 + 4)/50</code></pre>
+<pre><code>## [1] 0.98</code></pre>
+<pre class="r"><code># Sensitivity
+4/5</code></pre>
+<pre><code>## [1] 0.8</code></pre>
+<pre class="r"><code># Specificity
+45/45</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code># Precision
+4/5</code></pre>
+<pre><code>## [1] 0.8</code></pre>
+<pre class="r"><code>data$logit &lt;- predict(fiast, type = &quot;link&quot;)  #get log-odds for everyone
+
+table(predict = as.numeric(probssss &gt; 0.5), truth = data$y) %&gt;% 
+    addmargins</code></pre>
+<pre><code>##        truth
+## predict  0  1 Sum
+##     0   45  1  46
+##     1    0  4   4
+##     Sum 45  5  50</code></pre>
+<pre class="r"><code>## Density plot of log-odds for each outcome:
+
+data %&gt;% ggplot() + geom_density(aes(logit, color = EnoughFiber, 
+    fill = EnoughFiber), alpha = 0.4) + theme(legend.position = c(0.85, 
+    0.85)) + geom_vline(xintercept = 0) + xlab(&quot;logit (log-odds)&quot;) + 
+    geom_rug(aes(logit, color = EnoughFiber)) + geom_text(x = -5, 
+    y = 0.07, label = &quot;TN = 45&quot;) + geom_text(x = -1.75, y = 0.008, 
+    label = &quot;FN = 1&quot;) + geom_text(x = 1, y = 0.006, label = &quot;FP = 0&quot;) + 
+    geom_text(x = 5, y = 0.04, label = &quot;TP = 4&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-5-2.png" width="768" style="display: block; margin: auto;" />
+<em>The AUC is 0.98 which is great and the accuracy, sensitivity, specificity and precision are all pretty high! Going up 1 calorie increase the odds of the day containing enough fiber by 1.03 while going up 1 heart rate unit increases the same odd by 0.980.</em></p>
+<p>#6</p>
+<pre class="r"><code>bigboi</code></pre>
+<pre><code>## # A tibble: 50 x 9
+## Day MaxHR AvgHR WoDuration Calories EnoughFiber
+Woduration_C Calaories_c AvgHR_c
+## &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 1 184 149 65 1677 No -1.76 9.54 24.4
+## 2 2 175 109 64 1683 No -2.76 15.5 -15.6
+## 3 3 184 116 80 1686 No 13.2 18.5 -8.62
+## 4 4 160 100 59 1684 No -7.76 16.5 -24.6
+## 5 5 180 142 68 1682 No 1.24 14.5 17.4
+## 6 6 170 124 70 1068 No 3.24 -599.  -0.62
+## 7 7 180 142 85 1680 No 18.2 12.5 17.4
+## 8 8 160 100 86 2250 Yes 19.2 583.  -24.6
+## 9 9 169 116 89 1686 No 22.2 18.5 -8.62
+## 10 10 165 108 68 1689 No 1.24 21.5 -16.6
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>fiastsda &lt;- glm(y ~ Calories + MaxHR + AvgHR + WoDuration, data = data, 
+    family = binomial(link = &quot;logit&quot;))
+
+probssssas &lt;- predict(fiastsda, type = &quot;response&quot;)
+
+
+ROCplotass &lt;- ggplot(data) + geom_roc(aes(d = y, m = probssssas), 
+    n.cuts = 0)
+
+ROCplotass</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(ROCplotass)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.9822222</code></pre>
+<pre class="r"><code>table(predict = as.numeric(probssssas &gt; 0.5), truth = data$y) %&gt;% 
+    addmargins</code></pre>
+<pre><code>##        truth
+## predict  0  1 Sum
+##     0   45  1  46
+##     1    0  4   4
+##     Sum 45  5  50</code></pre>
+<pre class="r"><code># Accuracy
+(45 + 4)/50</code></pre>
+<pre><code>## [1] 0.98</code></pre>
+<pre class="r"><code># Sensitivity
+4/5</code></pre>
+<pre><code>## [1] 0.8</code></pre>
+<pre class="r"><code># Specificity
+45/45</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code># Precision
+4/5</code></pre>
+<pre><code>## [1] 0.8</code></pre>
+<pre class="r"><code>class_diag(predict(fiastsda, type = &quot;response&quot;), data$y)</code></pre>
+<pre><code>##    acc sens spec ppv       auc
+## 1 0.98  0.8    1   1 0.9822222</code></pre>
+<pre class="r"><code>library(glmnet)  #install.packages(&#39;glmnet&#39;) if you need to
+set.seed(1234)
+y &lt;- as.matrix(data$y)  #grab response
+x &lt;- model.matrix(y ~ (.), data = data)[, -1]  #grab predictors
+head(x)</code></pre>
+<pre><code>## Day MaxHR AvgHR WoDuration Calories EnoughFiberYes
+Woduration_C Calaories_c AvgHR_c logit
+## 1 1 184 149 65 1677 0 -1.76 9.54 24.38 -4.448505
+## 2 2 175 109 64 1683 0 -2.76 15.54 -15.62 -3.442930
+## 3 3 184 116 80 1686 0 13.24 18.54 -8.62 -3.482215
+## 4 4 160 100 59 1684 0 -7.76 16.54 -24.62 -3.228488
+## 5 5 180 142 68 1682 0 1.24 14.54 17.38 -4.139214
+## 6 6 170 124 70 1068 0 3.24 -599.46 -0.62 -24.500839</code></pre>
+<pre class="r"><code>data</code></pre>
+<pre><code>## # A tibble: 50 x 11
+## Day MaxHR AvgHR WoDuration Calories EnoughFiber
+Woduration_C Calaories_c AvgHR_c y logit
+## &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+&lt;dbl&gt; &lt;dbl&gt;
+## 1 1 184 149 65 1677 No -1.76 9.54 24.4 0 -4.45
+## 2 2 175 109 64 1683 No -2.76 15.5 -15.6 0 -3.44
+## 3 3 184 116 80 1686 No 13.2 18.5 -8.62 0 -3.48
+## 4 4 160 100 59 1684 No -7.76 16.5 -24.6 0 -3.23
+## 5 5 180 142 68 1682 No 1.24 14.5 17.4 0 -4.14
+## 6 6 170 124 70 1068 No 3.24 -599.  -0.62 0 -24.5
+## 7 7 180 142 85 1680 No 18.2 12.5 17.4 0 -4.21
+## 8 8 160 100 86 2250 Yes 19.2 583.  -24.6 1 15.9
+## 9 9 169 116 89 1686 No 22.2 18.5 -8.62 0 -3.48
+## 10 10 165 108 68 1689 No 1.24 21.5 -16.6 0 -3.22
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>cv &lt;- cv.glmnet(x, y, family = &quot;binomial&quot;)
+{
+    plot(cv$glmnet.fit, &quot;lambda&quot;, label = TRUE)
+    abline(v = log(cv$lambda.1se))
+    abline(v = log(cv$lambda.min), lty = 2)
+}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-6-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>lasso &lt;- glmnet(x, y, family = &quot;binomial&quot;, lambda = cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 11 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                       s0
+## (Intercept)    -8.438973
+## Day             .       
+## MaxHR           .       
+## AvgHR           .       
+## WoDuration      .       
+## Calories        .       
+## EnoughFiberYes 14.678997
+## Woduration_C    .       
+## Calaories_c     .       
+## AvgHR_c         .       
+## logit           .</code></pre>
+<pre class="r"><code>library(tidyverse)
+
+lassofit &lt;- glm(y ~ EnoughFiber, data = data, family = &quot;binomial&quot;)
+
+
+lassodata &lt;- data %&gt;% mutate(EnoughFiber = ifelse(EnoughFiber == 
+    &quot;Yes&quot;, 1, 0))
+
+lassodata</code></pre>
+<pre><code>## # A tibble: 50 x 11
+## Day MaxHR AvgHR WoDuration Calories EnoughFiber
+Woduration_C Calaories_c AvgHR_c y logit
+## &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+&lt;dbl&gt; &lt;dbl&gt;
+## 1 1 184 149 65 1677 0 -1.76 9.54 24.4 0 -4.45
+## 2 2 175 109 64 1683 0 -2.76 15.5 -15.6 0 -3.44
+## 3 3 184 116 80 1686 0 13.2 18.5 -8.62 0 -3.48
+## 4 4 160 100 59 1684 0 -7.76 16.5 -24.6 0 -3.23
+## 5 5 180 142 68 1682 0 1.24 14.5 17.4 0 -4.14
+## 6 6 170 124 70 1068 0 3.24 -599.  -0.62 0 -24.5
+## 7 7 180 142 85 1680 0 18.2 12.5 17.4 0 -4.21
+## 8 8 160 100 86 2250 1 19.2 583.  -24.6 1 15.9
+## 9 9 169 116 89 1686 0 22.2 18.5 -8.62 0 -3.48
+## 10 10 165 108 68 1689 0 1.24 21.5 -16.6 0 -3.22
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>class_diag(predict(lassofit, type = &quot;response&quot;), lassodata$y)</code></pre>
+<pre><code>##   acc sens spec ppv auc
+## 1   1    1    1   1   1</code></pre>
+<p><em>The auc for the initial model before lasso with all the variables is 0.56444 and the sensitivity is awful while the accuracy and specificity are high! When I ran the lasso, only the EnoughFiber variable remained! The new auc ended up being 1! This is higher than the previous AUCs calculated!</em>
+…</p>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

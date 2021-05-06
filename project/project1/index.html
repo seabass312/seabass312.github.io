@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Hugo Certuche" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Exploration of Health Data of Hugo Certuche</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project1/">Exploration of Health Data of Hugo Certuche</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<p><em>This project was a very interesting one and as such I thought loud and hard about what data I was going to use for it! I am quite passionate about health and fitness. The variables that I collected using MyFitnessPal are Calories, which is the number that I consumed each day and EnoughFiber which is whether or not I got the recommended amount of fiber for the day. The variables that I got from my workout tracker are MaxHR, which is my maximum heart rate, AvgHR, which is my average heart rate, and WoDuration which is the duration of my workout. I expect that there will be a positive correlation between AvgHR and MaxHR.</em></p>
+<p>1 Datasets</p>
+<pre class="r"><code>library(tidyverse)
+HeartRateStats &lt;- read_csv(&quot;HeartRateStatsss.csv&quot;)
+HR &lt;- HeartRateStats
+HR</code></pre>
+<pre><code>## # A tibble: 50 x 4
+##      Day MaxHR AvgHR WoDuration
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;
+##  1     1   184   149         65
+##  2     2   175   109         64
+##  3     3   184   116         80
+##  4     4   160   100         59
+##  5     5   180   142         68
+##  6     6   170   124         70
+##  7     7   180   142         85
+##  8     8   160   100         86
+##  9     9   169   116         89
+## 10    10   165   108         68
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>HeartRateStats</code></pre>
+<pre><code>## # A tibble: 50 x 4
+##      Day MaxHR AvgHR WoDuration
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;
+##  1     1   184   149         65
+##  2     2   175   109         64
+##  3     3   184   116         80
+##  4     4   160   100         59
+##  5     5   180   142         68
+##  6     6   170   124         70
+##  7     7   180   142         85
+##  8     8   160   100         86
+##  9     9   169   116         89
+## 10    10   165   108         68
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>MyFitnessPalStatsProject &lt;- read_csv(&quot;MyFitnessPalStatsProject.csv&quot;)
+HR</code></pre>
+<pre><code>## # A tibble: 50 x 4
+##      Day MaxHR AvgHR WoDuration
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;
+##  1     1   184   149         65
+##  2     2   175   109         64
+##  3     3   184   116         80
+##  4     4   160   100         59
+##  5     5   180   142         68
+##  6     6   170   124         70
+##  7     7   180   142         85
+##  8     8   160   100         86
+##  9     9   169   116         89
+## 10    10   165   108         68
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>HR %&gt;% pivot_longer(cols = c(&quot;Day&quot;, &quot;MaxHR&quot;, &quot;AvgHR&quot;, &quot;WoDuration&quot;), 
+    names_to = &quot;varr&quot;, values_to = &quot;value&quot;)</code></pre>
+<pre><code>## # A tibble: 200 x 2
+##    varr       value
+##    &lt;chr&gt;      &lt;dbl&gt;
+##  1 Day            1
+##  2 MaxHR        184
+##  3 AvgHR        149
+##  4 WoDuration    65
+##  5 Day            2
+##  6 MaxHR        175
+##  7 AvgHR        109
+##  8 WoDuration    64
+##  9 Day            3
+## 10 MaxHR        184
+## # … with 190 more rows</code></pre>
+<p><em>I loaded in my datasets for my workout stats and food stats. My data was already tidy but I did use pivot_longer to demonstrate how that I can manipulate the data for my workout data accordingly.</em></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Joining</li>
+</ol>
+<pre class="r"><code>bigboi &lt;- full_join(HR, MyFitnessPalStatsProject, by = c(&quot;Day&quot;))
+
+
+
+bigboi</code></pre>
+<pre><code>## # A tibble: 50 x 6
+##      Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
+##  1     1   184   149         65     1677 No         
+##  2     2   175   109         64     1683 No         
+##  3     3   184   116         80     1686 No         
+##  4     4   160   100         59     1684 No         
+##  5     5   180   142         68     1682 No         
+##  6     6   170   124         70     1068 No         
+##  7     7   180   142         85     1680 No         
+##  8     8   160   100         86     2250 Yes        
+##  9     9   169   116         89     1686 No         
+## 10    10   165   108         68     1689 No         
+## # … with 40 more rows</code></pre>
+<p><em>I did a full_join for this datasets and had no variables that were dropped from the dataset! I choose a full join because I did not want anything to be dropped.</em></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Summary Statistics</li>
+</ol>
+<pre class="r"><code>bigboi %&gt;% mutate(pulses = AvgHR * WoDuration)</code></pre>
+<pre><code>## # A tibble: 50 x 7
+##      Day MaxHR AvgHR WoDuration Calories EnoughFiber pulses
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;
+##  1     1   184   149         65     1677 No            9685
+##  2     2   175   109         64     1683 No            6976
+##  3     3   184   116         80     1686 No            9280
+##  4     4   160   100         59     1684 No            5900
+##  5     5   180   142         68     1682 No            9656
+##  6     6   170   124         70     1068 No            8680
+##  7     7   180   142         85     1680 No           12070
+##  8     8   160   100         86     2250 Yes           8600
+##  9     9   169   116         89     1686 No           10324
+## 10    10   165   108         68     1689 No            7344
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>bigboi %&gt;% filter(EnoughFiber == &quot;Yes&quot;) %&gt;% arrange(Calories)</code></pre>
+<pre><code>## # A tibble: 5 x 6
+##     Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
+## 1    50   181   117         68     1698 Yes        
+## 2    34   175   130         68     1900 Yes        
+## 3    26   183    98         62     2100 Yes        
+## 4    38   179   102         75     2200 Yes        
+## 5     8   160   100         86     2250 Yes</code></pre>
+<pre class="r"><code>bigboi %&gt;% select(MaxHR, AvgHR, Calories)</code></pre>
+<pre><code>## # A tibble: 50 x 3
+##    MaxHR AvgHR Calories
+##    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+##  1   184   149     1677
+##  2   175   109     1683
+##  3   184   116     1686
+##  4   160   100     1684
+##  5   180   142     1682
+##  6   170   124     1068
+##  7   180   142     1680
+##  8   160   100     2250
+##  9   169   116     1686
+## 10   165   108     1689
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>bigboi %&gt;% group_by(Day)</code></pre>
+<pre><code>## # A tibble: 50 x 6
+## # Groups:   Day [50]
+##      Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
+##  1     1   184   149         65     1677 No         
+##  2     2   175   109         64     1683 No         
+##  3     3   184   116         80     1686 No         
+##  4     4   160   100         59     1684 No         
+##  5     5   180   142         68     1682 No         
+##  6     6   170   124         70     1068 No         
+##  7     7   180   142         85     1680 No         
+##  8     8   160   100         86     2250 Yes        
+##  9     9   169   116         89     1686 No         
+## 10    10   165   108         68     1689 No         
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>bigboi %&gt;% summarise_all(mean)</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##     Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;
+## 1  25.5  180.  125.       66.8    1667.          NA</code></pre>
+<pre class="r"><code>bigboi %&gt;% summarise_all(sd)</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##     Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;
+## 1  14.6  7.64  18.8       8.55     175.          NA</code></pre>
+<pre class="r"><code>bigboi %&gt;% group_by(EnoughFiber) %&gt;% summarize_all(mean)</code></pre>
+<pre><code>## # A tibble: 2 x 6
+##   EnoughFiber   Day MaxHR AvgHR WoDuration Calories
+##   &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+## 1 No           24.9  180.  126.       66.2    1627.
+## 2 Yes          31.2  176.  109.       71.8    2030.</code></pre>
+<pre class="r"><code>bigboi %&gt;% group_by(EnoughFiber) %&gt;% summarize_all(sd)</code></pre>
+<pre><code>## # A tibble: 2 x 6
+##   EnoughFiber   Day MaxHR AvgHR WoDuration Calories
+##   &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+## 1 No           14.5  7.42  18.6       8.40     113.
+## 2 Yes          15.6  9.21  13.7       9.18     229.</code></pre>
+<pre class="r"><code>bigboi %&gt;% summarize_all(n_distinct)</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##     Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;      &lt;int&gt;    &lt;int&gt;       &lt;int&gt;
+## 1    50    20    36         24       37           2</code></pre>
+<pre class="r"><code>bigboi %&gt;% summarize_all(max)</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##     Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
+## 1    50   190   156         89     2250 Yes</code></pre>
+<pre class="r"><code>bigboi %&gt;% summarize_all(min)</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##     Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
+## 1     1   160    91         44     1068 No</code></pre>
+<pre class="r"><code>cormut &lt;- bigboi %&gt;% select_if(is.numeric) %&gt;% cor(use = &quot;pair&quot;)
+
+
+
+cormut</code></pre>
+<pre><code>##                    Day      MaxHR       AvgHR  WoDuration    Calories
+## Day         1.00000000  0.4729713  0.02681194 -0.06910755  0.06520612
+## MaxHR       0.47297134  1.0000000  0.43611917 -0.15715363 -0.11497974
+## AvgHR       0.02681194  0.4361192  1.00000000 -0.27870889 -0.18054416
+## WoDuration -0.06910755 -0.1571536 -0.27870889  1.00000000  0.14482734
+## Calories    0.06520612 -0.1149797 -0.18054416  0.14482734  1.00000000</code></pre>
+<pre class="r"><code>tidycorr &lt;- cormut %&gt;% as.data.frame %&gt;% rownames_to_column(&quot;var1&quot;) %&gt;% 
+    pivot_longer(-1, names_to = &quot;var2&quot;, values_to = &quot;correlation&quot;)
+
+tidycorr</code></pre>
+<pre><code>## # A tibble: 25 x 3
+##    var1  var2       correlation
+##    &lt;chr&gt; &lt;chr&gt;            &lt;dbl&gt;
+##  1 Day   Day             1     
+##  2 Day   MaxHR           0.473 
+##  3 Day   AvgHR           0.0268
+##  4 Day   WoDuration     -0.0691
+##  5 Day   Calories        0.0652
+##  6 MaxHR Day             0.473 
+##  7 MaxHR MaxHR           1     
+##  8 MaxHR AvgHR           0.436 
+##  9 MaxHR WoDuration     -0.157 
+## 10 MaxHR Calories       -0.115 
+## # … with 15 more rows</code></pre>
+<p><em>I used all six dplyrs in various forms. I made a new variable called pulses that represents number of heart beats during a workout. I also got the means and standard deviations of all the variables. I also calculated the means and standard deviations for each variables after grouping by fiber content. Last I made a correlation matrix. I mainly noticed that in the groups of EnoughFiber, the enough fiber group had much more calories than the not enough fiber. The other thing I noticed is that group with more fiber also had a longer mean workout duration.</em></p>
+<ol start="4" style="list-style-type: decimal">
+<li>Visualizations</li>
+</ol>
+<pre class="r"><code>tidycorr %&gt;% ggplot(aes(var1, var2, fill = correlation)) + geom_tile() + 
+    scale_fill_gradient2(low = &quot;red&quot;, mid = &quot;white&quot;, high = &quot;blue&quot;) + 
+    geom_text(aes(label = round(correlation, 2)), color = &quot;black&quot;, 
+        size = 4) + theme(axis.text.x = element_text(angle = 90, 
+    hjust = 1)) + coord_fixed() + theme_gray()</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(bigboi, aes(x = AvgHR, y = MaxHR, color = EnoughFiber, 
+    size = 2)) + theme(legend.position = &quot;none&quot;) + ggtitle(&quot;MaxHR As A Function of AvgHR&quot;) + 
+    ylab(&quot;MaxHR&quot;) + xlab(&quot;AvgHR&quot;) + geom_point() + theme_dark() + 
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10))</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(bigboi, aes(x = WoDuration, y = Calories, color = &quot;orange&quot;)) + 
+    geom_bar(stat = &quot;summary&quot;, fun = mean) + geom_errorbar(stat = &quot;summary&quot;, 
+    fun.data = mean_se) + ggtitle(&quot;Calories As A Function of Workout Duration&quot;) + 
+    theme_gray()</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" />
+<em>For the correlation heatmap, none of the variables have what is considered a strong relationship but interestingly the MaxHR and AvgHR have the greatest correlation of all the pairs that were looked at. The pair with the lowest was WoDuration and Calories. Moving on to the scatter plot, we see that there is a general appearance of a positive correlation between AvgHR and MaxHR but as noted with the correlation matrix, there is not truly a positive relationship here. Another thing to note is that the low fiber points are clustered more towards the lower part of the AvgHR when compared to the high fiber groups. Now for the last graph a big thing that jumped out at me is that there is quite a bit of spacing between the 60 minute and 76 minute mark. What this indicates that most of the workouts I did were around that time frame. Save for certain bars, the calories per minute are pretty consistent. I’d imagine it’s because I was in a bigger caloric deficit when I did my longer workouts.</em></p>
+<ol start="5" style="list-style-type: decimal">
+<li>Clustering</li>
+</ol>
+<pre class="r"><code>library(cluster)
+
+bigboi</code></pre>
+<pre><code>## # A tibble: 50 x 6
+##      Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
+##  1     1   184   149         65     1677 No         
+##  2     2   175   109         64     1683 No         
+##  3     3   184   116         80     1686 No         
+##  4     4   160   100         59     1684 No         
+##  5     5   180   142         68     1682 No         
+##  6     6   170   124         70     1068 No         
+##  7     7   180   142         85     1680 No         
+##  8     8   160   100         86     2250 Yes        
+##  9     9   169   116         89     1686 No         
+## 10    10   165   108         68     1689 No         
+## # … with 40 more rows</code></pre>
+<pre class="r"><code>clust_data &lt;- bigboi %&gt;% dplyr::select(AvgHR, MaxHR, WoDuration, 
+    Calories)  #Clustering on numeric Variables
+
+
+sil_width &lt;- vector()  #empty vector to hold mean sil width
+for (i in 2:10) {
+    kms &lt;- kmeans(clust_data, centers = i)  #compute k-means solution
+    sil &lt;- silhouette(kms$cluster, dist(clust_data))  #get sil widths
+    sil_width[i] &lt;- mean(sil[, 3])  #take averages (higher is better)
+}
+ggplot() + geom_line(aes(x = 1:10, y = sil_width)) + scale_x_continuous(name = &quot;k&quot;, 
+    breaks = 1:10)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># This graph shows that we should use two clusters as the
+# silhouette width at that point is greatest!
+
+
+set.seed(348)
+pam2 &lt;- clust_data %&gt;% scale %&gt;% pam(k = 3)
+pam2  #setting Clustering</code></pre>
+<pre><code>## Medoids:
+##      ID      AvgHR      MaxHR WoDuration    Calories
+## [1,]  1  1.2987891  0.5526972 -0.2058739  0.05453658
+## [2,] 36 -0.5657564  0.4217263  0.2620213 -0.09981223
+## [3,] 10 -0.8853927 -1.9357500  0.1450475  0.12313605
+## Clustering vector:
+##  [1] 1 2 2 3 1 3 1 3 3 3 3 3 2 3 1 1 1 1 1 1 1 1 2 1 2 2 2 1 2 2 2 2 2 2 2 2 2 2
+## [39] 2 2 2 1 1 2 1 1 2 1 1 2
+## Objective function:
+##    build     swap 
+## 1.298320 1.279484 
+## 
+## Available components:
+##  [1] &quot;medoids&quot;    &quot;id.med&quot;     &quot;clustering&quot; &quot;objective&quot;  &quot;isolation&quot; 
+##  [6] &quot;clusinfo&quot;   &quot;silinfo&quot;    &quot;diss&quot;       &quot;call&quot;       &quot;data&quot;</code></pre>
+<pre class="r"><code>yeetclust &lt;- clust_data %&gt;% mutate(cluster = as.factor(pam2$clustering))  #saving so it can be plotted
+
+yeetclust %&gt;% group_by(cluster) %&gt;% summarise_if(is.numeric, 
+    mean, na.rm = T)  #Means for clusters</code></pre>
+<pre><code>## # A tibble: 3 x 5
+##   cluster AvgHR MaxHR WoDuration Calories
+##   &lt;fct&gt;   &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+## 1 1        145.  183.       62.8    1656.
+## 2 2        113.  182.       69.0    1680.
+## 3 3        109.  165.       69.6    1657.</code></pre>
+<pre class="r"><code>bigboi %&gt;% slice(pam2$id.med)</code></pre>
+<pre><code>## # A tibble: 3 x 6
+##     Day MaxHR AvgHR WoDuration Calories EnoughFiber
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      
+## 1     1   184   149         65     1677 No         
+## 2    36   183   114         69     1650 No         
+## 3    10   165   108         68     1689 No</code></pre>
+<pre class="r"><code>pam2$silinfo$avg.width</code></pre>
+<pre><code>## [1] 0.2600751</code></pre>
+<pre class="r"><code>plot(pam2, which = 2)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>final &lt;- bigboi %&gt;% mutate(cluster = pam2$clustering)
+
+library(GGally)
+ggpairs(final, columns = 1:4, aes(color = as.factor(cluster)))</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" />
+<em>For this section I started by clustering my data, and getting the silhouette widths in order to see what the best cluster number is! When I did this I saw that 3 clusters is the best and I went ahead and did the PAM for that. I also got the means for the clusters as well. Following this I got the goodness of fit, which gave me a value o 0.26 average silhouette width which indicates that the structure is weak. For the heart rate pair, we see that Clusters 1 and 2 are pretty grouped together and associated with high maximum heart rate and high average heart rate but that Cluster 3 is more distinct and associated with low values for both heart rate metrics. For the both the pairs of hear rate variables with Workout duration we do not see much variance of hear rate values except with the left side of the MaxHR and WoDuration which could be explained by a shorter more intense workout.</em></p>
+<P style="page-break-before: always">
+<div style="page-break-after: always;"></div>
+<pre class="r"><code>## paste this chunk into the ```{r setup} chunk at the top of
+## your project 1 .Rmd file
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = &quot;center&quot;, 
+    warning = F, message = F, tidy = TRUE, tidy.opts = list(width.cutoff = 60), 
+    R.options = list(max.print = 100))</code></pre>
+<p>…</p>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
