@@ -44,4 +44,4 @@ print(hi,r.hi) #access R-defined objects with r.
 [Link to project 2](/project/project2/)
 
 
-[Favorite memes](https://rr.noordstar.me/dbf253f9)
+[Favorite memes](https://www.youtube.com/watch?v=6-HUgzYPm9g)
